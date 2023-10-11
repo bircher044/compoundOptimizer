@@ -1,7 +1,9 @@
 // SPDX-License-Identifier: BUSL-1.1
 pragma solidity 0.8.20;
 
-interface Comet {
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+
+interface Comet is IERC20 {
     /**
      * @dev Note: Does not accrue interest first
      * @param utilization The utilization to check the supply rate for

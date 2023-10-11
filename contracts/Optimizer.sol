@@ -2,10 +2,11 @@
 pragma solidity 0.8.20;
 
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC4626.sol";
+import "./interfaces/Comet.sol";
 
 contract Optimizer is ERC4626 {
-    IERC20 public compoundUsdc;
-    IERC20 public compoundUsdc_e;
+    Comet public compoundUsdc;
+    Comet public compoundUsdc_e;
     uint8 public position;
 
     constructor(
@@ -14,8 +15,8 @@ contract Optimizer is ERC4626 {
         address _compoundUsdc,
         address _compoundUsdc_e
     ) ERC4626(IERC20(_compoundUsdc)) ERC20(_name, _symbol) {
-        compoundUsdc = IERC20(_compoundUsdc);
-        compoundUsdc_e = IERC20(_compoundUsdc_e);
+        compoundUsdc = Comet(_compoundUsdc);
+        compoundUsdc_e = Comet(_compoundUsdc_e);
     }
 
     function getCurrentUnderlying() internal view returns (IERC20) {
@@ -30,6 +31,11 @@ contract Optimizer is ERC4626 {
         return
             compoundUsdc.balanceOf(address(this)) +
             compoundUsdc_e.balanceOf(address(this));
+    }
+
+    function getAPR(Comet comet) public view returns (uint64) {
+        uint256 itilization = comet.getUtilization();
+        return comet.getSupplyRate(itilization);
     }
 
     function _deposit(
