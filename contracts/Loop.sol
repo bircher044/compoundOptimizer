@@ -10,27 +10,27 @@ contract Loop is Ownable {
     IERC20 public borrowableToken;
     IERC20 public supplyToken;
 
+    error InvalidData(uint64 loops, uint64 supplyAmountsLength, uint64 borrowAmountsLength);
+
     constructor(
         address _iToken,
         address _supplyToken,
         address _borrowableToken,
         uint64 loops,
-        uint256 initialSupply,
-        uint256 initialBorrow
+        uint256[] memory supplyAmounts,
+        uint256[] memory borrowAmounts
     ) Ownable(msg.sender) {
+        if (loops != supplyAmounts) {
+            revert InvalidData(loops, supplyAmounts.length, borrowAmounts.length);
+        }
+
         comet = IComet(_iToken);
         supplyToken = IERC20(_supplyToken);
         borrowableToken = IERC20(_borrowableToken);
         loop();
     }
 
-    function loop(
-        uint64 loops,
-        address supplyToken,
-        address borrowabletoken,
-        uint256 supplyAmount,
-        uint256 borrowAmount
-    ) internal {
+    function loop(uint64 loops, uint256 supplyAmount, uint256 borrowAmount) internal {
         loops--;
         supply(supplyToken, supplyAmount);
         borrow(borrowToken);
@@ -44,9 +44,5 @@ contract Loop is Ownable {
         comet.supply(token, amount);
     }
 
-    function swap(
-        address token1,
-        address token2,
-        uint256 amountOutMin
-    ) internal {}
+    function swap(address token1, address token2, uint256 amountOutMin) internal {}
 }
