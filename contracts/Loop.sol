@@ -29,7 +29,7 @@ contract Loop is Ownable {
 		poolFee = _poolFee;
 	}
 
-	function loop(uint64 loops, uint256[] memory supplyAmounts, uint256[] memory withdrawAmounts) public onlyOwner {
+	function makeLoop(uint64 loops, uint256[] memory supplyAmounts, uint256[] memory withdrawAmounts) public onlyOwner {
 		if (loops != supplyAmounts.length || loops != withdrawAmounts.length) {
 			revert InvalidData(loops, supplyAmounts.length, withdrawAmounts.length);
 		}
@@ -41,7 +41,11 @@ contract Loop is Ownable {
 		}
 	}
 
-	function unLoop(uint64 loops, uint256[] memory supplyAmounts, uint256[] memory withdrawAmounts) public onlyOwner {
+	function removeLoop(
+		uint64 loops,
+		uint256[] memory supplyAmounts,
+		uint256[] memory withdrawAmounts
+	) public onlyOwner {
 		if (loops != supplyAmounts.length || loops != withdrawAmounts.length) {
 			revert InvalidData(loops, supplyAmounts.length, withdrawAmounts.length);
 		}
