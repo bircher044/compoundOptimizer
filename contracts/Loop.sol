@@ -3,16 +3,24 @@ pragma solidity 0.8.20;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol";
 import "./interfaces/IComet.sol";
 
 contract Loop is Ownable {
 	address public comet;
 	address public borrowableToken;
 	address public supplyToken;
+	address public immutable swapRouter;
 
 	error InvalidData(uint64 loops, uint256 supplyAmountsLength, uint256 borrowAmountsLength);
 
-	constructor(address _comet, address _supplyToken, address _borrowableToken) Ownable(msg.sender) {
+	constructor(
+		address _swapRouter,
+		address _comet,
+		address _supplyToken,
+		address _borrowableToken
+	) Ownable(msg.sender) {
+		swapRouter = _swapRouter;
 		comet = _comet;
 		supplyToken = _supplyToken;
 		borrowableToken = _borrowableToken;
@@ -25,8 +33,8 @@ contract Loop is Ownable {
 
 		for (uint64 i = 0; i < loops; i++) {
 			supply(supplyToken, supplyAmounts[i]);
-			swap(borrowableToken, supplyToken, supplyAmounts[i]);
 			borrow(borrowableToken, borrowAmounts[i]);
+			swap(borrowableToken, supplyToken, supplyAmounts[i]);
 		}
 	}
 
