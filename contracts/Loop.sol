@@ -8,9 +8,8 @@ import "./interfaces/IComet.sol";
 
 contract Loop is Ownable {
 	address public comet;
-
-	address public borrowableToken;
 	address public supplyToken;
+	address public borrowableToken;
 	address public immutable swapRouter;
 	uint24 public immutable poolFee;
 
@@ -34,7 +33,6 @@ contract Loop is Ownable {
 		if (loops != supplyAmounts.length || loops != withdrawAmounts.length) {
 			revert InvalidData(loops, supplyAmounts.length, withdrawAmounts.length);
 		}
-		IERC20(supplyToken).transferFrom(msg.sender, address(this), supplyAmounts[0]);
 
 		for (uint64 i = 0; i < loops; i++) {
 			supply(supplyToken, supplyAmounts[i]);
