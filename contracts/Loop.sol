@@ -30,20 +30,35 @@ contract Loop is Ownable {
 		poolFee = _poolFee;
 	}
 
-	function loop(uint64 loops, uint256[] memory supplyAmounts, uint256[] memory borrowAmounts) public onlyOwner {
-		if (loops != supplyAmounts.length || loops != borrowAmounts.length) {
-			revert InvalidData(loops, supplyAmounts.length, borrowAmounts.length);
+	function loop(uint64 loops, uint256[] memory supplyAmounts, uint256[] memory withdrawAmounts) public onlyOwner {
+		if (loops != supplyAmounts.length || loops != withdrawAmounts.length) {
+			revert InvalidData(loops, supplyAmounts.length, withdrawAmounts.length);
 		}
 		IERC20(supplyToken).transferFrom(msg.sender, address(this), supplyAmounts[0]);
 
 		for (uint64 i = 0; i < loops; i++) {
 			supply(supplyToken, supplyAmounts[i]);
-			borrow(borrowableToken, borrowAmounts[i]);
+			withdraw(borrowableToken, withdrawAmounts[i]);
 			swap(borrowableToken, supplyToken, IERC20(borrowableToken).balanceOf(address(this)), supplyAmounts[i]);
 		}
 	}
 
-	function borrow(address token, uint256 amount) internal {
+	function unLoop(uint64 loops, uint256[] memory supplyAmounts, uint256[] memory withdrawAmounts) public onlyOwner {
+		if (loops != supplyAmounts.length || loops != withdrawAmounts.length) {
+			revert InvalidData(loops, supplyAmounts.length, withdrawAmounts.length);
+		}
+
+		for (uint64 i = 0; i < loops; i++) {
+			swap(supplyToken, borrowableToken, IERC20(supplyToken).balanceOf(address(this)), supplyAmounts[i]);
+			supply(borrowableToken, supplyAmounts[i]);
+			withdraw(supplyToken, withdrawAmounts[i]);
+		}
+
+		IERC20(supplyToken).transfer(msg.sender, IERC20(supplyToken).balanceOf(address(this)));
+	}
+
+	//same as borrow
+	function withdraw(address token, uint256 amount) internal {
 		Comet(comet).withdraw(token, amount);
 	}
 
